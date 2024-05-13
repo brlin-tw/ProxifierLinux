@@ -5,7 +5,7 @@ proxyfier alternative for linux using redsocks. Proxify all linux applications t
 
 Install [redsocks](https://github.com/darkk/redsocks#packages).
 
-```
+```bash
 git clone https://github.com/tazihad/proxifier-linux.git
 cd proxifier-linux
 ```
