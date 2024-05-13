@@ -4,7 +4,16 @@ Upstream-Contact: Issues · The Common / The Common Project Template · GitLab <
 Source: https://gitlab.com/the-common/project-template
 
 Files:
- *README.md
  */README.md
 Copyright: 2021 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
 License: CC-BY-SA-4.0+
+
+Files:
+ README.md
+ redsocks-start
+ redsocks.conf
+ setup-iptables
+ start-proxifier.sh
+ stop-proxifier.sh
+Copyright: 2021 Zihad <tazihad@gmail.com>
+License: LicenseRef-Undefined
