@@ -29,6 +29,15 @@ if ! trap 'printf "Error: The program has encountered an unhandled error and is 
 fi
 
 printf \
+    'Info: Checking whether the running user is correct...\n'
+if test "${EUID}" -ne 0; then
+    printf \
+        'Error: This program is required to be run as the superuser(root) user.\n' \
+        1>&2
+    exit 1
+fi
+
+printf \
     'Info: Creating the REDSOCKS nat table rule chain to host redsocks-specific packet filtering rules...\n'
 if ! iptables -t nat -N REDSOCKS; then
     printf \
