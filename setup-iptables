@@ -28,8 +28,14 @@ if ! trap 'printf "Error: The program has encountered an unhandled error and is 
     exit 1
 fi
 
-# Create new chain
-iptables -t nat -N REDSOCKS
+printf \
+    'Info: Creating the REDSOCKS nat table rule chain to host redsocks-specific packet filtering rules...\n'
+if ! iptables -t nat -N REDSOCKS; then
+    printf \
+        'Error: Unable to create the REDSOCKS rule chain.\n' \
+        1>&2
+    exit 2
+fi
 
 # Ignore LANs and some other reserved addresses.
 iptables -t nat -A REDSOCKS -d 0.0.0.0/8 -j RETURN
