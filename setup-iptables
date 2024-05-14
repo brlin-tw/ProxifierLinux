@@ -28,6 +28,28 @@ if ! trap 'printf "Error: The program has encountered an unhandled error and is 
     exit 1
 fi
 
+if test "${#}" -ne 0; then
+    printf \
+        'Info: Processing the command-line arguments...\n'
+    while test "${#}" -ne 0; do
+        case "${1}" in
+            --help|-h)
+                printf \
+                    'Usage: %s [--help]\n' \
+                    "${0}"
+                exit 0
+            ;;
+            *)
+                printf \
+                    'Error: Unsupported command-line option "%s".\n' \
+                    "${0}" \
+                    1>&2
+                exit 1
+            ;;
+        esac
+    done
+fi
+
 printf \
     'Info: Checking whether the running user is correct...\n'
 if test "${EUID}" -ne 0; then
