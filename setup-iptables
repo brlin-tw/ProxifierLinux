@@ -55,10 +55,23 @@ if ! iptables -t nat -A REDSOCKS -d 127.0.0.0/8 -j RETURN; then
     exit 2
 fi
 
-# Ignore LANs and some other reserved addresses.
-iptables -t nat -A REDSOCKS -d 169.254.0.0/16 -j RETURN
-iptables -t nat -A REDSOCKS -d 224.0.0.0/4 -j RETURN
-iptables -t nat -A REDSOCKS -d 240.0.0.0/4 -j RETURN
+printf \
+    'Info: Avoid redirecting packets that are destined to the Automatic Private IP Addressing(APIPA) IP addresses...'
+if ! iptables -t nat -A REDSOCKS -d 169.254.0.0/16 -j RETURN; then
+    printf \
+        'Error: Unable to avoid redirecting packets that are destined to the Automatic Private IP Addressing(APIPA) IP addresses.\n' \
+        1>&2
+    exit 2
+fi
+
+printf \
+    'Info: Avoid redirecting packets that are destined to the multicast IP addresses...'
+if ! iptables -t nat -A REDSOCKS -d 224.0.0.0/4,240.0.0.0/4 -j RETURN; then
+    printf \
+        'Error: Unable to avoid redirecting packets that are destined to the Automatic Private IP Addressing(APIPA) IP addresses.\n' \
+        1>&2
+    exit 2
+fi
 
 # Anything else should be redirected to port 12345
 iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 12345
