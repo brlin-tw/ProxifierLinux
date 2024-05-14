@@ -27,6 +27,6 @@ cd proxifier-linux
 
 The following third-party materials are referenced during the development of this project:
 
-* [redsocks](https://github.com/darkk/redsocks)
-* [superuser](https://superuser.com/a/1402071)
-* [crosp.net](https://crosp.net/blog/administration/install-configure-redsocks-proxy-centos-linux/)
+* [darkk/redsocks: transparent TCP-to-proxy redirector](https://github.com/darkk/redsocks)
+* [networking - How to force all Linux apps to use SOCKS proxy - Super User](https://superuser.com/a/1402071)
+* [How to install and configure Redsocks on Centos Linux | Alexander Molochko](https://crosp.net/blog/administration/install-configure-redsocks-proxy-centos-linux/)
