@@ -69,13 +69,26 @@ fi
 
 case "${operation_mode}" in
     set)
-        printf \
-            'Info: Creating the REDSOCKS nat table rule chain to host redsocks-specific packet filtering rules...\n'
-        if ! iptables -t nat -N REDSOCKS; then
+        if ! chain_rules="$(iptables -t nat -S REDSOCKS 2>/dev/null)"; then
             printf \
-                'Error: Unable to create the REDSOCKS rule chain.\n' \
-                1>&2
-            exit 2
+                'Info: Creating the REDSOCKS nat table rule chain to host redsocks-specific packet filtering rules...\n'
+            if ! iptables -t nat -N REDSOCKS; then
+                printf \
+                    'Error: Unable to create the REDSOCKS rule chain.\n' \
+                    1>&2
+                exit 2
+            fi
+        fi
+
+        if test "${chain_rules}" != '-N REDSOCKS'; then
+            printf \
+                'Info: Flushing the existing rules in the REDSOCKS rule chain...\n'
+            if ! iptables -t nat -F REDSOCKS; then
+                printf \
+                    'Error: Unable to flush the existing rules in the REDSOCKS rule chain.\n' \
+                    1>&2
+                exit 2
+            fi
         fi
 
         printf \
@@ -123,22 +136,27 @@ case "${operation_mode}" in
             exit 2
         fi
 
-        printf \
-            'Info: Redirecting all outgoing packets to the REDSOCKS rule chain...\n'
-        if ! iptables -t nat -A OUTPUT -j REDSOCKS; then
+        if ! iptables -t nat -C OUTPUT -j REDSOCKS 2>/dev/null; then
             printf \
-                'Error: Unable to redirect all outgoing packets to the REDSOCKS rule chain.\n' \
-                1>&2
-            exit 2
+                'Info: Redirecting all outgoing packets to the REDSOCKS rule chain...\n'
+            if ! iptables -t nat -A OUTPUT -j REDSOCKS; then
+                printf \
+                    'Error: Unable to redirect all outgoing packets to the REDSOCKS rule chain.\n' \
+                    1>&2
+                exit 2
+            fi
         fi
 
-        printf \
-            'Info: Redirecting all incoming packets to the REDSOCKS rule chain...\n'
-        if ! iptables -t nat -A PREROUTING -j REDSOCKS; then
+
+        if ! iptables -t nat -C PREROUTING -j REDSOCKS 2>/dev/null; then
             printf \
-                'Error: Unable to redirect all incoming packets to the REDSOCKS rule chain.\n' \
-                1>&2
-            exit 2
+                'Info: Redirecting all incoming packets to the REDSOCKS rule chain...\n'
+            if ! iptables -t nat -A PREROUTING -j REDSOCKS; then
+                printf \
+                    'Error: Unable to redirect all incoming packets to the REDSOCKS rule chain.\n' \
+                    1>&2
+                exit 2
+            fi
         fi
     ;;
     reset)
