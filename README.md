@@ -35,3 +35,5 @@ The following third-party materials are referenced during the development of thi
   Explains the `-d` command-line option of the `iptables` command.
 * [networking - Where are addresses from the network 0.0.0.0/8 used in practice? - Super User](https://superuser.com/questions/388056/where-are-addresses-from-the-network-0-0-0-0-8-used-in-practice)  
   Explains what the addresses of the 0.0.0.0/8 subnet are used for.
+* -C, --check _chain_ _rule-specification_ - COMMANDS - OPTIONS - The iptables(8) manual page  
+  Explains how to check whether the specified rule exist in the firewall.
