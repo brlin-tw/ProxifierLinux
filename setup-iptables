@@ -1,4 +1,5 @@
 #!/bin/sh
+# Setup iptables firewall rules to forward packets through the redsocks service
 
 # Create new chain
 iptables -t nat -N REDSOCKS
