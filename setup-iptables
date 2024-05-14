@@ -28,6 +28,10 @@ if ! trap 'printf "Error: The program has encountered an unhandled error and is 
     exit 1
 fi
 
+# "set" is not the set builtin command
+# shellcheck disable=SC2209
+operation_mode=set
+
 if test "${#}" -ne 0; then
     printf \
         'Info: Processing the command-line arguments...\n'
@@ -38,6 +42,10 @@ if test "${#}" -ne 0; then
                     'Usage: %s [--help]\n' \
                     "${0}"
                 exit 0
+            ;;
+            --reset|-r)
+                operation_mode=reset
+                shift
             ;;
             *)
                 printf \
@@ -59,77 +67,129 @@ if test "${EUID}" -ne 0; then
     exit 1
 fi
 
-printf \
-    'Info: Creating the REDSOCKS nat table rule chain to host redsocks-specific packet filtering rules...\n'
-if ! iptables -t nat -N REDSOCKS; then
-    printf \
-        'Error: Unable to create the REDSOCKS rule chain.\n' \
-        1>&2
-    exit 2
-fi
+case "${operation_mode}" in
+    set)
+        printf \
+            'Info: Creating the REDSOCKS nat table rule chain to host redsocks-specific packet filtering rules...\n'
+        if ! iptables -t nat -N REDSOCKS; then
+            printf \
+                'Error: Unable to create the REDSOCKS rule chain.\n' \
+                1>&2
+            exit 2
+        fi
 
-printf \
-    'Info: Avoid redirecting packets that are destined to the IPv4 private IP addresses...\n'
-if ! iptables -t nat -A REDSOCKS -d 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 -j RETURN; then
-    printf \
-        'Error: Unable to avoid redirecting packets that are destined to the IPv4 private IP addresses.\n' \
-        1>&2
-    exit 2
-fi
+        printf \
+            'Info: Avoid redirecting packets that are destined to the IPv4 private IP addresses...\n'
+        if ! iptables -t nat -A REDSOCKS -d 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 -j RETURN; then
+            printf \
+                'Error: Unable to avoid redirecting packets that are destined to the IPv4 private IP addresses.\n' \
+                1>&2
+            exit 2
+        fi
 
-printf \
-    'Info: Avoid redirecting packets that are destined to the loopback IP addresses...\n'
-if ! iptables -t nat -A REDSOCKS -d 127.0.0.0/8 -j RETURN; then
-    printf \
-        'Error: Unable to avoid redirecting packets that are destined to the loopback IP addresses.\n' \
-        1>&2
-    exit 2
-fi
+        printf \
+            'Info: Avoid redirecting packets that are destined to the loopback IP addresses...\n'
+        if ! iptables -t nat -A REDSOCKS -d 127.0.0.0/8 -j RETURN; then
+            printf \
+                'Error: Unable to avoid redirecting packets that are destined to the loopback IP addresses.\n' \
+                1>&2
+            exit 2
+        fi
 
-printf \
-    'Info: Avoid redirecting packets that are destined to the Automatic Private IP Addressing(APIPA) IP addresses...\n'
-if ! iptables -t nat -A REDSOCKS -d 169.254.0.0/16 -j RETURN; then
-    printf \
-        'Error: Unable to avoid redirecting packets that are destined to the Automatic Private IP Addressing(APIPA) IP addresses.\n' \
-        1>&2
-    exit 2
-fi
+        printf \
+            'Info: Avoid redirecting packets that are destined to the Automatic Private IP Addressing(APIPA) IP addresses...\n'
+        if ! iptables -t nat -A REDSOCKS -d 169.254.0.0/16 -j RETURN; then
+            printf \
+                'Error: Unable to avoid redirecting packets that are destined to the Automatic Private IP Addressing(APIPA) IP addresses.\n' \
+                1>&2
+            exit 2
+        fi
 
-printf \
-    'Info: Avoid redirecting packets that are destined to the multicast IP addresses...\n'
-if ! iptables -t nat -A REDSOCKS -d 224.0.0.0/4,240.0.0.0/4 -j RETURN; then
-    printf \
-        'Error: Unable to avoid redirecting packets that are destined to the Automatic Private IP Addressing(APIPA) IP addresses.\n' \
-        1>&2
-    exit 2
-fi
+        printf \
+            'Info: Avoid redirecting packets that are destined to the multicast IP addresses...\n'
+        if ! iptables -t nat -A REDSOCKS -d 224.0.0.0/4,240.0.0.0/4 -j RETURN; then
+            printf \
+                'Error: Unable to avoid redirecting packets that are destined to the Automatic Private IP Addressing(APIPA) IP addresses.\n' \
+                1>&2
+            exit 2
+        fi
 
-printf \
-    'Info: Redirecting all other packets to the redsocks service...\n'
-if ! iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 12345; then
-    printf \
-        'Error: Unable to redirect all other packets to the redsocks service.\n' \
-        1>&2
-    exit 2
-fi
+        printf \
+            'Info: Redirecting all other packets to the redsocks service...\n'
+        if ! iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 12345; then
+            printf \
+                'Error: Unable to redirect all other packets to the redsocks service.\n' \
+                1>&2
+            exit 2
+        fi
 
-printf \
-    'Info: Redirecting all outgoing packets to the REDSOCKS rule chain...\n'
-if ! iptables -t nat -A OUTPUT -j REDSOCKS; then
-    printf \
-        'Error: Unable to redirect all outgoing packets to the REDSOCKS rule chain.\n' \
-        1>&2
-    exit 2
-fi
+        printf \
+            'Info: Redirecting all outgoing packets to the REDSOCKS rule chain...\n'
+        if ! iptables -t nat -A OUTPUT -j REDSOCKS; then
+            printf \
+                'Error: Unable to redirect all outgoing packets to the REDSOCKS rule chain.\n' \
+                1>&2
+            exit 2
+        fi
 
-printf \
-    'Info: Redirecting all incoming packets to the REDSOCKS rule chain...\n'
-if ! iptables -t nat -A PREROUTING -j REDSOCKS; then
-    printf \
-        'Error: Unable to redirect all incoming packets to the REDSOCKS rule chain.\n' \
-        1>&2
-    exit 2
-fi
+        printf \
+            'Info: Redirecting all incoming packets to the REDSOCKS rule chain...\n'
+        if ! iptables -t nat -A PREROUTING -j REDSOCKS; then
+            printf \
+                'Error: Unable to redirect all incoming packets to the REDSOCKS rule chain.\n' \
+                1>&2
+            exit 2
+        fi
+    ;;
+    reset)
+        if iptables -t nat -n -L REDSOCKS &>/dev/null; then
+            if iptables -t nat -C PREROUTING -j REDSOCKS 2>/dev/null; then
+                printf \
+                    'Info: Removing the incoming packet redirection rule...\n'
+                if ! iptables -t nat -D PREROUTING -j REDSOCKS; then
+                    printf \
+                        'Error: Unable to remove the incoming packet redirection rule.\n'
+                    exit 2
+                fi
+            fi
+
+            if iptables -t nat -C OUTPUT -j REDSOCKS 2>/dev/null; then
+                printf \
+                    'Info: Removing the outgoing packet redirection rule...\n'
+                if ! iptables -t nat -D OUTPUT -j REDSOCKS; then
+                    printf \
+                        'Error: Unable to remove the outgoing packet redirection rule.\n'
+                    exit 2
+                fi
+            fi
+
+            printf \
+                'Info: Flushing the REDSOCKS rule chain...\n'
+            if ! iptables -t nat -F REDSOCKS; then
+                printf \
+                    'Error: Unable to flush the REDSOCKS rule chain.\n' \
+                    1>&2
+                exit 2
+            fi
+
+            printf \
+                'Info: Removing the REDSOCKS rule chain...\n'
+            if ! iptables -t nat -X REDSOCKS; then
+                printf \
+                    'Error: Unable to remove the REDSOCKS rule chain.\n' \
+                    1>&2
+                exit 2
+            fi
+        fi
+    ;;
+    *)
+        printf \
+            'FATAL: The value of the operation_mode parameter is unsupported: %s.\n' \
+            "${operation_mode}" \
+            1>&2
+        exit 99
+    ;;
+esac
 
 printf \
     'Info: Operation completed without errors.\n'
