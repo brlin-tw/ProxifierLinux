@@ -163,22 +163,26 @@ case "${operation_mode}" in
                 fi
             fi
 
-            printf \
-                'Info: Flushing the REDSOCKS rule chain...\n'
-            if ! iptables -t nat -F REDSOCKS; then
-                printf \
-                    'Error: Unable to flush the REDSOCKS rule chain.\n' \
-                    1>&2
-                exit 2
-            fi
+            if chain_rules="$(iptables -t nat -S REDSOCKS 2>/dev/null)"; then
+                if test "${chain_rules}" != '-N REDSOCKS'; then
+                    printf \
+                        'Info: Flushing the REDSOCKS rule chain...\n'
+                    if ! iptables -t nat -F REDSOCKS; then
+                        printf \
+                            'Error: Unable to flush the REDSOCKS rule chain.\n' \
+                            1>&2
+                        exit 2
+                    fi
+                fi
 
-            printf \
-                'Info: Removing the REDSOCKS rule chain...\n'
-            if ! iptables -t nat -X REDSOCKS; then
                 printf \
-                    'Error: Unable to remove the REDSOCKS rule chain.\n' \
-                    1>&2
-                exit 2
+                    'Info: Removing the REDSOCKS rule chain...\n'
+                if ! iptables -t nat -X REDSOCKS; then
+                    printf \
+                        'Error: Unable to remove the REDSOCKS rule chain.\n' \
+                        1>&2
+                    exit 2
+                fi
             fi
         fi
     ;;
