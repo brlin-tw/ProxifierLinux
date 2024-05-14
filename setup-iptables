@@ -102,7 +102,7 @@ fi
 
 printf \
     'Info: Redirecting all incoming packets to the REDSOCKS rule chain...\n'
-if ! iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDSOCKS; then
+if ! iptables -t nat -A PREROUTING -j REDSOCKS; then
     printf \
         'Error: Unable to redirect all incoming packets to the REDSOCKS rule chain.\n' \
         1>&2
