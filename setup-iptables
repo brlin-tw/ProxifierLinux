@@ -108,3 +108,6 @@ if ! iptables -t nat -A PREROUTING -j REDSOCKS; then
         1>&2
     exit 2
 fi
+
+printf \
+    'Info: Operation completed without errors.\n'
