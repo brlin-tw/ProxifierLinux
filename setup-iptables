@@ -38,7 +38,6 @@ if ! iptables -t nat -N REDSOCKS; then
 fi
 
 # Ignore LANs and some other reserved addresses.
-iptables -t nat -A REDSOCKS -d 0.0.0.0/8 -j RETURN
 iptables -t nat -A REDSOCKS -d 10.0.0.0/8 -j RETURN
 iptables -t nat -A REDSOCKS -d 127.0.0.0/8 -j RETURN
 iptables -t nat -A REDSOCKS -d 169.254.0.0/16 -j RETURN
