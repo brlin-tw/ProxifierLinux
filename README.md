@@ -23,4 +23,10 @@ cd proxifier-linux
 1. CTRL+Z to exit first script and flush iptables  
    `sudo ./stop-proxifier.sh`
 
-More Information:  [redsocks](https://github.com/darkk/redsocks), [superuser](https://superuser.com/a/1402071), [crosp.net](https://crosp.net/blog/administration/install-configure-redsocks-proxy-centos-linux/)
+## References
+
+The following third-party materials are referenced during the development of this project:
+
+* [redsocks](https://github.com/darkk/redsocks)
+* [superuser](https://superuser.com/a/1402071)
+* [crosp.net](https://crosp.net/blog/administration/install-configure-redsocks-proxy-centos-linux/)
