@@ -82,10 +82,20 @@ if ! iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 12345; then
     exit 2
 fi
 
-# Redirect all HTTP and HTTPS outgoing packets through Redsocks
-iptables -t nat -A OUTPUT -p tcp --dport 443 -j REDSOCKS
-iptables -t nat -A OUTPUT -p tcp --dport 80 -j REDSOCKS
+printf \
+    'Info: Redirecting all outgoing packets to the REDSOCKS rule chain...\n'
+if ! iptables -t nat -A OUTPUT -j REDSOCKS; then
+    printf \
+        'Error: Unable to redirect all outgoing packets to the REDSOCKS rule chain.\n' \
+        1>&2
+    exit 2
+fi
 
-# Defining the following rules in the PREROUTING chain. For redirecting incomming packets to the REDSOCKS chain.
-iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDSOCKS
-iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDSOCKS
+printf \
+    'Info: Redirecting all incoming packets to the REDSOCKS rule chain...\n'
+if ! iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDSOCKS; then
+    printf \
+        'Error: Unable to redirect all incoming packets to the REDSOCKS rule chain.\n' \
+        1>&2
+    exit 2
+fi
