@@ -47,7 +47,7 @@ if ! iptables -t nat -N REDSOCKS; then
 fi
 
 printf \
-    'Info: Avoid redirecting packets that are destined to the IPv4 private IP addresses...'
+    'Info: Avoid redirecting packets that are destined to the IPv4 private IP addresses...\n'
 if ! iptables -t nat -A REDSOCKS -d 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 -j RETURN; then
     printf \
         'Error: Unable to avoid redirecting packets that are destined to the IPv4 private IP addresses.\n' \
@@ -56,7 +56,7 @@ if ! iptables -t nat -A REDSOCKS -d 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 -j R
 fi
 
 printf \
-    'Info: Avoid redirecting packets that are destined to the loopback IP addresses...'
+    'Info: Avoid redirecting packets that are destined to the loopback IP addresses...\n'
 if ! iptables -t nat -A REDSOCKS -d 127.0.0.0/8 -j RETURN; then
     printf \
         'Error: Unable to avoid redirecting packets that are destined to the loopback IP addresses.\n' \
@@ -65,7 +65,7 @@ if ! iptables -t nat -A REDSOCKS -d 127.0.0.0/8 -j RETURN; then
 fi
 
 printf \
-    'Info: Avoid redirecting packets that are destined to the Automatic Private IP Addressing(APIPA) IP addresses...'
+    'Info: Avoid redirecting packets that are destined to the Automatic Private IP Addressing(APIPA) IP addresses...\n'
 if ! iptables -t nat -A REDSOCKS -d 169.254.0.0/16 -j RETURN; then
     printf \
         'Error: Unable to avoid redirecting packets that are destined to the Automatic Private IP Addressing(APIPA) IP addresses.\n' \
@@ -74,7 +74,7 @@ if ! iptables -t nat -A REDSOCKS -d 169.254.0.0/16 -j RETURN; then
 fi
 
 printf \
-    'Info: Avoid redirecting packets that are destined to the multicast IP addresses...'
+    'Info: Avoid redirecting packets that are destined to the multicast IP addresses...\n'
 if ! iptables -t nat -A REDSOCKS -d 224.0.0.0/4,240.0.0.0/4 -j RETURN; then
     printf \
         'Error: Unable to avoid redirecting packets that are destined to the Automatic Private IP Addressing(APIPA) IP addresses.\n' \
