@@ -73,8 +73,14 @@ if ! iptables -t nat -A REDSOCKS -d 224.0.0.0/4,240.0.0.0/4 -j RETURN; then
     exit 2
 fi
 
-# Anything else should be redirected to port 12345
-iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 12345
+printf \
+    'Info: Redirecting all other packets to the redsocks service...\n'
+if ! iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 12345; then
+    printf \
+        'Error: Unable to redirect all other packets to the redsocks service.\n' \
+        1>&2
+    exit 2
+fi
 
 # Redirect all HTTP and HTTPS outgoing packets through Redsocks
 iptables -t nat -A OUTPUT -p tcp --dport 443 -j REDSOCKS
