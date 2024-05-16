@@ -96,40 +96,106 @@ if ! trap trap_err ERR; then
     exit 1
 fi
 
-printf \
-    'Info: Enabling SOCKS service over SSH...\n'
-ssh_opts=(
-    # Specify port of the SSH service
-    -p "${SSH_PORT}"
+operation_mode=enable
 
-    # Enable SOCKS forwwarding service
-    -D "${SOCKS_HOST}:${SOCKS_PORT}"
-
-    # Enable quiet mode to suppress unnecessary messages
-    -q
-
-    # Enable compression: Is this really needed?
-    #-C
-
-    # Do not execute remote command, only run the forwarding service
-    -N
-
-    # Go to background after authentication to avoid stucking the
-    # terminal
-    -f
-
-    # Setup control socket to support disabling the SOCKS service
-    -S "${script_name}.sshd.socket"
-)
-# The parameter expansions is indeed should be expanded on the client
-# side
-# shellcheck disable=SC2029
-if ! ssh "${ssh_opts[@]}" "${SSH_USER}@${SSH_HOST}"; then
+if test "${#}" -ne 0; then
     printf \
-        'Error: Unable to enable SOCKS service over SSH.\n' \
-        1>&2
-    exit 2
+        'Info: Processing the command-line arguments...\n'
+    while test "${#}" -ne 0; do
+        case "${1}" in
+            --help|-h)
+                printf \
+                    'Usage: %s [--help] [--disable]\n' \
+                    "${0}"
+                exit 0
+            ;;
+            --disable|-d)
+                operation_mode=disable
+                shift
+            ;;
+            *)
+                printf \
+                    'Error: Unsupported command-line option "%s".\n' \
+                    "${1}" \
+                    1>&2
+                exit 1
+            ;;
+        esac
+    done
 fi
 
+ssh_control_socket="${script_name}.sshd.socket"
+case "${operation_mode}" in
+    enable)
+        printf \
+            'Info: Enabling SOCKS service over SSH...\n'
+        ssh_opts=(
+            # Specify port of the SSH service
+            -p "${SSH_PORT}"
+
+            # Enable SOCKS forwwarding service
+            -D "${SOCKS_HOST}:${SOCKS_PORT}"
+
+            # Enable compression: Is this really needed?
+            #-C
+
+            # Do not execute remote command, only run the forwarding service
+            -N
+
+            # Go to background after authentication to avoid stucking the
+            # terminal
+            -f
+
+            # Setup control socket to support disabling the SOCKS service
+            -S "${ssh_control_socket}"
+        )
+        # The parameter expansions is indeed should be expanded on the client
+        # side
+        # shellcheck disable=SC2029
+        if ! ssh "${ssh_opts[@]}" "${SSH_USER}@${SSH_HOST}"; then
+            printf \
+                'Error: Unable to enable SOCKS service over SSH.\n' \
+                1>&2
+            exit 2
+        fi
+    ;;
+    disable)
+        printf \
+            'Info: Disabling the SSH SOCKS service...\n'
+        if ! test -e "${ssh_control_socket}"; then
+            printf \
+                'Error: SSH control socket file not found.\n' \
+                1>&2
+            exit 2
+        fi
+
+        ssh_opts=(
+            # Specify port of the SSH service
+            -p "${SSH_PORT}"
+
+            # Setup control socket to support disabling the SOCKS service
+            -S "${ssh_control_socket}"
+
+            # Signal the service to shutdown
+            -O exit
+        )
+        # The parameter expansions is indeed should be expanded on the client
+        # side
+        # shellcheck disable=SC2029
+        if ! ssh "${ssh_opts[@]}" "${SSH_USER}@${SSH_HOST}"; then
+            printf \
+                'Error: Unable to disable the SSH SOCKS service.\n' \
+                1>&2
+            exit 2
+        fi
+    ;;
+    *)
+        printf \
+            'FATAL: Unsupported operation_mode "%s".\n' \
+            "${operation_mode}" \
+            1>&2
+        exit 99
+    ;;
+esac
 printf \
     'Info: Operation completed without errors.\n'
