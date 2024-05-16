@@ -124,7 +124,7 @@ if test "${#}" -ne 0; then
     done
 fi
 
-ssh_control_socket="${script_name}.sshd.socket"
+ssh_control_socket="${script_name}.ssh.socket"
 case "${operation_mode}" in
     enable)
         printf \
