@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Setup iptables firewall rules to forward packets through the redsocks service
 
+REDSOCKS_PORT="${REDSOCKS_PORT:-12345}"
+
 printf \
     'Info: Configuring the defensive interpreter behaviors...\n'
 set_opts=(
@@ -129,7 +131,7 @@ case "${operation_mode}" in
 
         printf \
             'Info: Redirecting all other packets to the redsocks service...\n'
-        if ! iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 12345; then
+        if ! iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports "${REDSOCKS_PORT}"; then
             printf \
                 'Error: Unable to redirect all other packets to the redsocks service.\n' \
                 1>&2
