@@ -52,7 +52,7 @@ if test "${#}" -ne 0; then
             *)
                 printf \
                     'Error: Unsupported command-line option "%s".\n' \
-                    "${0}" \
+                    "${1}" \
                     1>&2
                 exit 1
             ;;
