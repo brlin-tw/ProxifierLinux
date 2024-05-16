@@ -17,7 +17,7 @@ Section under rennovations.
 
 <!--
 1. Setup redsocks.conf (Example config given)  
-   `/etc/redsocks.conf`
+   `/etc/redsocks.conf.sample`
 -->
 
 ## References
