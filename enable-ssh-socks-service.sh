@@ -119,7 +119,7 @@ ssh_opts=(
     -f
 
     # Setup control socket to support disabling the SOCKS service
-    -S "${script_dir}/${script_name}.sshd.socket"
+    -S "${script_name}.sshd.socket"
 )
 # The parameter expansions is indeed should be expanded on the client
 # side
