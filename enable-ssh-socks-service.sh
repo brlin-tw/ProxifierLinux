@@ -30,6 +30,36 @@ if ! set "${set_opts[@]}"; then
 fi
 
 printf \
+    'Info: Configuring the convenience variables...\n'
+if test -v BASH_SOURCE; then
+    # Convenience variables may not need to be referenced
+    # shellcheck disable=SC2034
+    {
+        printf \
+            'Info: Determining the absolute path of the program...\n'
+        if ! script="$(
+            realpath \
+                --strip \
+                "${BASH_SOURCE[0]}"
+            )"; then
+            printf \
+                'Error: Unable to determine the absolute path of the program.\n' \
+                1>&2
+            exit 1
+        fi
+        script_dir="${script%/*}"
+        script_filename="${script##*/}"
+        script_name="${script_filename%%.*}"
+    }
+fi
+# Convenience variables may not need to be referenced
+# shellcheck disable=SC2034
+{
+    script_basecommand="${0}"
+    script_args=("${@}")
+}
+
+printf \
     'Info: Checking the existence of the required commands...\n'
 required_commands=(
     ssh
@@ -87,6 +117,9 @@ ssh_opts=(
     # Go to background after authentication to avoid stucking the
     # terminal
     -f
+
+    # Setup control socket to support disabling the SOCKS service
+    -S "${script_dir}/${script_name}.sshd.socket"
 )
 # The parameter expansions is indeed should be expanded on the client
 # side
