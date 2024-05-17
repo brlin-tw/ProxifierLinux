@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: The Common Project Template
-Upstream-Contact: Issues · The Common / The Common Project Template · GitLab <https://gitlab.com/the-common/project-template/-/issues>
-Source: https://gitlab.com/the-common/project-template
+Upstream-Name: ProxifierLinux
+Upstream-Contact: Issues · 林博仁 Buo-ren, Lin / ProxifierLinux · GitLab <https://gitlab.com/brlin/ProxifierLinux/-/issues>
+Source: https://gitlab.com/brlin/ProxifierLinux
 
 Files:
     */README.md
