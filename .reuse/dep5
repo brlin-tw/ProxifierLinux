@@ -10,10 +10,9 @@ License: CC-BY-SA-4.0+
 
 Files:
     README.md
-    redsocks-start
-    redsocks.conf
+    redsocks.conf.sample
     setup-iptables
-    start-proxifier.sh
-    stop-proxifier.sh
-Copyright: 2021 Zihad <tazihad@gmail.com>
+Copyright:
+    2021 Zihad <tazihad@gmail.com>
+    2024 林博仁(Buo-ren, Lin) <Buo.Ren.Lin@gmail.com>
 License: LicenseRef-Undefined
